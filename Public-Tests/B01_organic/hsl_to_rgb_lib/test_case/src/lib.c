@@ -2,7 +2,11 @@
 
 #include "lib.h"
 
-void hsl_to_rgb(float *dest, const float *src) {
+void hsl_to_rgb(float *dest, const float *src)
+    __CPROVER_requires(__CPROVER_is_fresh(dest, 3 * sizeof(float)))
+    __CPROVER_requires(__CPROVER_is_fresh(src, 3 * sizeof(float)))
+    __CPROVER_assigns(__CPROVER_object_whole(dest))
+{
     float h = src[0];
     float s = src[1];
     float l = src[2];

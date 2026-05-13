@@ -1,6 +1,11 @@
 #include "lib.h"
 
-unsigned hdr_bitrate(const uint8_t *h) {
+unsigned hdr_bitrate(const uint8_t *h)
+    __CPROVER_requires(__CPROVER_is_fresh(h, 4 * sizeof(uint8_t)))
+    __CPROVER_requires(((h[1] >> 1) & 3) != 0)
+    __CPROVER_requires((h[2] >> 4) <= 14)
+    __CPROVER_assigns()
+{
     static const uint8_t halfrate[2][3][15] = {
         {{0, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 72, 80},
          {0, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 72, 80},

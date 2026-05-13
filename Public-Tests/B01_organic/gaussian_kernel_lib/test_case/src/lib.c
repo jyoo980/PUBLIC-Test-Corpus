@@ -2,7 +2,12 @@
 
 #include "lib.h"
 
-void gaussian_kernel(float *dest, int size, float radius) {
+void gaussian_kernel(float *dest, int size, float radius)
+    __CPROVER_requires(size >= 1 && size <= 5)
+    __CPROVER_requires(radius > 0.1f && radius < 100.0f)
+    __CPROVER_requires(__CPROVER_is_fresh(dest, 5 * sizeof(float)))
+    __CPROVER_assigns(__CPROVER_object_whole(dest))
+{
     float *k;
     float rs, s2, sum;
     float sigma = 1.6f;

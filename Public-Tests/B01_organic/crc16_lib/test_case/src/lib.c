@@ -2,7 +2,11 @@
 
 static const tflac_u16 tflac_crc16_tables[8][256];
 
-tflac_u16 crc16(const tflac_u8 *d, tflac_u32 len, tflac_u16 crc16) {
+tflac_u16 crc16(const tflac_u8 *d, tflac_u32 len, tflac_u16 crc16)
+    __CPROVER_requires(len <= 16)
+    __CPROVER_requires(__CPROVER_is_fresh(d, 16 * sizeof(tflac_u8)))
+    __CPROVER_assigns()
+{
     while (len >= 8) {
         crc16 ^= d[0] << 8 | d[1];
         crc16 = tflac_crc16_tables[7][crc16 >> 8] ^

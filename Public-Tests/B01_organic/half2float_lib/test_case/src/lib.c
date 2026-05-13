@@ -365,7 +365,11 @@ static uint32_t m__exponent[64] = {
     0x8b000000, 0x8b800000, 0x8c000000, 0x8c800000, 0x8d000000, 0x8d800000,
     0x8e000000, 0x8e800000, 0x8f000000, 0xc7800000};
 
-float half2float(uint16_t h) {
+float half2float(uint16_t h)
+    __CPROVER_requires(h <= 0xFFFF)
+    __CPROVER_requires(m__offset[h >> 10] <= 0x0400)
+    __CPROVER_assigns()
+{
     union {
         float flt;
         uint32_t num;

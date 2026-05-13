@@ -38,18 +38,24 @@ struct caf_data {
 };
 
 static ima_u16_t
-ima_bswap16(ima_u16_t v) {
+ima_bswap16(ima_u16_t v)
+    __CPROVER_assigns()
+{
     return (v << 0x08 & 0xff00u) | (v >> 0x08 & 0x00ffu);
 }
 
 static ima_u32_t
-ima_bswap32(ima_u32_t v) {
+ima_bswap32(ima_u32_t v)
+    __CPROVER_assigns()
+{
     return (v << 0x18 & 0xff000000ul) | (v << 0x08 & 0x00ff0000ul) |
            (v >> 0x08 & 0x0000ff00ul) | (v >> 0x18 & 0x000000fful);
 }
 
 static ima_u64_t
-ima_bswap64(ima_u64_t v) {
+ima_bswap64(ima_u64_t v)
+    __CPROVER_assigns()
+{
     return (v << 0x38 & 0xff00000000000000ull) |
            (v << 0x28 & 0x00ff000000000000ull) |
            (v << 0x18 & 0x0000ff0000000000ull) |
@@ -60,19 +66,29 @@ ima_bswap64(ima_u64_t v) {
            (v >> 0x38 & 0x00000000000000ffull);
 }
 
-static ima_u16_t ima_btoh16(ima_u16_t v) {
+static ima_u16_t ima_btoh16(ima_u16_t v)
+    __CPROVER_assigns()
+{
     return ima_bswap16(v);
 }
 
-static ima_u32_t ima_btoh32(ima_u32_t v) {
+static ima_u32_t ima_btoh32(ima_u32_t v)
+    __CPROVER_assigns()
+{
     return ima_bswap32(v);
 }
 
-static ima_u64_t ima_btoh64(ima_u64_t v) {
+static ima_u64_t ima_btoh64(ima_u64_t v)
+    __CPROVER_assigns()
+{
     return ima_bswap64(v);
 }
 
-int ima_parse(struct ima_info *info, const void *data) {
+int ima_parse(struct ima_info *info, const void *data)
+    __CPROVER_requires(__CPROVER_is_fresh(info, sizeof(struct ima_info)))
+    __CPROVER_requires(__CPROVER_is_fresh(data, 4096))
+    __CPROVER_assigns(__CPROVER_object_whole(info))
+{
     const struct caf_header *header = (const struct caf_header *)data;
     const struct caf_chunk *chunk = (const struct caf_chunk *)&header[1];
     const struct caf_audio_description *desc = NULL;

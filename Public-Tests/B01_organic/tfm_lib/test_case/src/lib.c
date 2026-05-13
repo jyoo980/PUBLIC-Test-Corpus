@@ -2,7 +2,12 @@
 
 #include "lib.h"
 
-void tfm(float *dest, const float *src, int count) {
+void tfm(float *dest, const float *src, int count)
+    __CPROVER_requires(count >= 0 && count <= 4)
+    __CPROVER_requires(__CPROVER_is_fresh(dest, 8 * sizeof(float)))
+    __CPROVER_requires(__CPROVER_is_fresh(src, 12 * sizeof(float)))
+    __CPROVER_assigns(__CPROVER_object_whole(dest))
+{
     int i;
     for (i = 0; i < count; i++) {
         if (src[0] < src[1]) {

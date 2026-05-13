@@ -1,6 +1,10 @@
 #include "lib.h"
 
-void md5_digest(const tflac_md5 *m, tflac_u8 out[16]) {
+void md5_digest(const tflac_md5 *m, tflac_u8 out[16])
+    __CPROVER_requires(__CPROVER_is_fresh(m, sizeof(tflac_md5)))
+    __CPROVER_requires(__CPROVER_is_fresh(out, 16 * sizeof(tflac_u8)))
+    __CPROVER_assigns(__CPROVER_object_whole(out))
+{
     out[0] = (tflac_u8)(m->a);
     out[1] = (tflac_u8)(m->a >> 8);
     out[2] = (tflac_u8)(m->a >> 16);

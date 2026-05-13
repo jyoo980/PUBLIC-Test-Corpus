@@ -1,6 +1,13 @@
 #include "lib.h"
 
-static uint32_t get_bits(bs_t *bs, int n) {
+static uint32_t get_bits(bs_t *bs, int n)
+    __CPROVER_requires(__CPROVER_is_fresh(bs, sizeof(bs_t)))
+    __CPROVER_requires(n > 0 && n <= 16)
+    __CPROVER_requires(bs->pos >= 0 && bs->pos <= 32)
+    __CPROVER_requires(bs->limit >= 0 && bs->limit <= 64)
+    __CPROVER_requires(__CPROVER_is_fresh(bs->buf, 16))
+    __CPROVER_assigns(bs->pos)
+{
     uint32_t next, cache = 0, s = bs->pos & 7;
     int shl = n + s;
     const uint8_t *p = bs->buf + (bs->pos >> 3);
@@ -14,7 +21,15 @@ static uint32_t get_bits(bs_t *bs, int n) {
     return cache | (next >> -shl);
 }
 
-int read_side_info(bs_t *bs, L3_gr_info_t *gr, const uint8_t *hdr) {
+int read_side_info(bs_t *bs, L3_gr_info_t *gr, const uint8_t *hdr)
+    __CPROVER_requires(__CPROVER_is_fresh(bs, sizeof(bs_t)))
+    __CPROVER_requires(__CPROVER_is_fresh(bs->buf, 16))
+    __CPROVER_requires(bs->pos >= 0 && bs->pos <= 16)
+    __CPROVER_requires(bs->limit >= 0 && bs->limit <= 32)
+    __CPROVER_requires(__CPROVER_is_fresh(gr, 4 * sizeof(L3_gr_info_t)))
+    __CPROVER_requires(__CPROVER_is_fresh(hdr, 4 * sizeof(uint8_t)))
+    __CPROVER_assigns(__CPROVER_object_whole(gr), __CPROVER_object_whole(bs))
+{
     static const uint8_t g_scf_long[8][23] = {
         {6,  6,  6,  6,  6,  6,  8,  10, 12, 14, 16, 20,
          24, 28, 32, 38, 46, 52, 60, 68, 58, 54, 0},
