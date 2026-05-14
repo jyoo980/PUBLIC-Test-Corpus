@@ -108,3 +108,4 @@ release/
 # Misc.
 .DS_Store
 *.json*
+*goto
