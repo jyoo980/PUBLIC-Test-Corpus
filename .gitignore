@@ -1,3 +1,7 @@
+# CBMC
+**/*lib__mutant_*.c
+**/*goto
+
 # DO NOT COMMIT, WILL LEAK TEST CASE NAMES
 Cargo.lock 
 *.lock
