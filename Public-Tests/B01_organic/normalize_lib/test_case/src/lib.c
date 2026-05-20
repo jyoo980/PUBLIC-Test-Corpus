@@ -3,7 +3,13 @@
 
 #include "lib.h"
 
-void normalize(float *dest, const float *src, int size) {
+void normalize(float *dest, const float *src, int size)
+    __CPROVER_requires(size >= 0)
+    __CPROVER_requires(size <= 8)
+    __CPROVER_requires(__CPROVER_is_fresh(src, size * sizeof(float)))
+    __CPROVER_requires(__CPROVER_is_fresh(dest, size * sizeof(float)))
+    __CPROVER_assigns(__CPROVER_object_upto(dest, size * sizeof(float)))
+{
     float sum = 0.0f;
     int i;
     for (i = 0; i < size; i++)

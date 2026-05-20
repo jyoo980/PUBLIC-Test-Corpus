@@ -1,6 +1,11 @@
 #include "lib.h"
 
-float ldexp_q2(float y, int exp_q2) {
+float ldexp_q2(float y, int exp_q2)
+__CPROVER_requires(exp_q2 >= 0 && exp_q2 <= 120)
+__CPROVER_requires(y == 0.0f)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0.0f)
+{
     static const float g_expfrac[4] = {9.31322575e-10f, 7.83145814e-10f,
                                        6.58544508e-10f, 5.53767716e-10f};
     int e;

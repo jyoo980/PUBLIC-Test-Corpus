@@ -15,38 +15,68 @@ typedef struct c2AABB {
     c2v max;
 } c2AABB;
 
-c2v c2V(float x, float y) {
+c2v c2V(float x, float y)
+__CPROVER_requires(x == x && y == y)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value.x == x && __CPROVER_return_value.y == y)
+{
     c2v a;
     a.x = x;
     a.y = y;
     return a;
 }
 
-c2v c2Maxv(c2v a, c2v b) {
+c2v c2Maxv(c2v a, c2v b)
+__CPROVER_requires(a.x == a.x && a.y == a.y && b.x == b.x && b.y == b.y)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value.x == (a.x > b.x ? a.x : b.x))
+__CPROVER_ensures(__CPROVER_return_value.y == (a.y > b.y ? a.y : b.y))
+{
     return c2V(((a.x) > (b.x) ? (a.x) : (b.x)),
                ((a.y) > (b.y) ? (a.y) : (b.y)));
 }
 
-c2v c2Minv(c2v a, c2v b) {
+c2v c2Minv(c2v a, c2v b)
+__CPROVER_requires(a.x == a.x && a.y == a.y && b.x == b.x && b.y == b.y)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value.x == (a.x < b.x ? a.x : b.x))
+__CPROVER_ensures(__CPROVER_return_value.y == (a.y < b.y ? a.y : b.y))
+{
     return c2V(((a.x) < (b.x) ? (a.x) : (b.x)),
                ((a.y) < (b.y) ? (a.y) : (b.y)));
 }
 
-c2v c2Clampv(c2v a, c2v lo, c2v hi) {
+c2v c2Clampv(c2v a, c2v lo, c2v hi)
+__CPROVER_requires(a.x == a.x && a.y == a.y)
+__CPROVER_requires(lo.x == lo.x && lo.y == lo.y)
+__CPROVER_requires(hi.x == hi.x && hi.y == hi.y)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value.x ==
+                  (lo.x > (a.x < hi.x ? a.x : hi.x) ? lo.x : (a.x < hi.x ? a.x : hi.x)))
+__CPROVER_ensures(__CPROVER_return_value.y ==
+                  (lo.y > (a.y < hi.y ? a.y : hi.y) ? lo.y : (a.y < hi.y ? a.y : hi.y)))
+{
     return c2Maxv(lo, c2Minv(a, hi));
 }
 
-c2v c2Sub(c2v a, c2v b) {
+c2v c2Sub(c2v a, c2v b)
+__CPROVER_assigns()
+{
     a.x -= b.x;
     a.y -= b.y;
     return a;
 }
 
-float c2Dot(c2v a, c2v b) {
+float c2Dot(c2v a, c2v b)
+__CPROVER_assigns()
+{
     return a.x * b.x + a.y * b.y;
 }
 
-int c2CircletoCircle(c2Circle A, c2Circle B) {
+int c2CircletoCircle(c2Circle A, c2Circle B)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == 1)
+{
     c2v c = c2Sub(B.p, A.p);
     float d2 = c2Dot(c, c);
     float r2 = A.r + B.r;
@@ -54,7 +84,13 @@ int c2CircletoCircle(c2Circle A, c2Circle B) {
     return d2 < r2;
 }
 
-int c2CircletoAABB(c2Circle A, c2AABB B) {
+int c2CircletoAABB(c2Circle A, c2AABB B)
+__CPROVER_requires(A.p.x == A.p.x && A.p.y == A.p.y)
+__CPROVER_requires(B.min.x == B.min.x && B.min.y == B.min.y)
+__CPROVER_requires(B.max.x == B.max.x && B.max.y == B.max.y)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == 1)
+{
     c2v L = c2Clampv(A.p, B.min, B.max);
     c2v ab = c2Sub(A.p, L);
     float d2 = c2Dot(ab, ab);
@@ -62,7 +98,14 @@ int c2CircletoAABB(c2Circle A, c2AABB B) {
     return d2 < r2;
 }
 
-int c2AABBtoAABB(c2AABB A, c2AABB B) {
+int c2AABBtoAABB(c2AABB A, c2AABB B)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == 1)
+__CPROVER_ensures(
+    (__CPROVER_return_value == 1) ==
+    (!(B.max.x < A.min.x) && !(A.max.x < B.min.x) &&
+     !(B.max.y < A.min.y) && !(A.max.y < B.min.y)))
+{
     int d0 = B.max.x < A.min.x;
     int d1 = A.max.x < B.min.x;
     int d2 = B.max.y < A.min.y;
@@ -70,7 +113,18 @@ int c2AABBtoAABB(c2AABB A, c2AABB B) {
     return !(d0 | d1 | d2 | d3);
 }
 
-int collided(const void *A, C2_TYPE typeA, const void *B, C2_TYPE typeB) {
+int collided(const void *A, C2_TYPE typeA, const void *B, C2_TYPE typeB)
+__CPROVER_requires(typeA == C2_TYPE_CIRCLE || typeA == C2_TYPE_AABB)
+__CPROVER_requires(typeB == C2_TYPE_CIRCLE || typeB == C2_TYPE_AABB)
+__CPROVER_requires(typeA == C2_TYPE_CIRCLE && typeB == C2_TYPE_CIRCLE ?
+                   __CPROVER_rw_ok(A, sizeof(c2Circle)) && __CPROVER_rw_ok(B, sizeof(c2Circle)) :
+                   typeA == C2_TYPE_CIRCLE && typeB == C2_TYPE_AABB ?
+                   __CPROVER_rw_ok(A, sizeof(c2Circle)) && __CPROVER_rw_ok(B, sizeof(c2AABB)) :
+                   typeA == C2_TYPE_AABB && typeB == C2_TYPE_CIRCLE ?
+                   __CPROVER_rw_ok(B, sizeof(c2Circle)) && __CPROVER_rw_ok(A, sizeof(c2AABB)) :
+                   __CPROVER_rw_ok(A, sizeof(c2AABB)) && __CPROVER_rw_ok(B, sizeof(c2AABB)))
+__CPROVER_assigns()
+{
     switch (typeA) {
     case C2_TYPE_CIRCLE:
         switch (typeB) {

@@ -1,6 +1,16 @@
 #include "lib.h"
 
-void premultiply(cp_image_t *img) {
+void premultiply(cp_image_t *img)
+__CPROVER_requires(__CPROVER_is_fresh(img, sizeof(cp_image_t)))
+__CPROVER_requires(img->w >= 1 && img->w <= 2)
+__CPROVER_requires(img->h >= 1 && img->h <= 2)
+__CPROVER_requires(__CPROVER_is_fresh(img->pix, img->w * img->h * sizeof(cp_pixel_t)))
+__CPROVER_assigns(__CPROVER_object_whole(img->pix))
+__CPROVER_ensures(__CPROVER_forall {
+    int k; (k >= 0 && k < __CPROVER_old(img->w) * __CPROVER_old(img->h)) ==>
+        img->pix[k].a == __CPROVER_old(img->pix[k].a)
+})
+{
     int w = img->w;
     int h = img->h;
     int stride = w * sizeof(cp_pixel_t);

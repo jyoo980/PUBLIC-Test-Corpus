@@ -8,11 +8,89 @@ enum TFLAC_CHANNEL_MODE {
     TFLAC_CHANNEL_MODE_COUNT = 4,
 };
 
-tflac_u32 tflac_size_memory(tflac_u32 blocksize) {
+tflac_u32 tflac_size_memory(tflac_u32 blocksize)
+__CPROVER_requires(blocksize <= 65535)
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == (tflac_u32)15U + (5U * ((15U + (blocksize * 4U)) & 0xFFFFFFF0U)))
+{
     return (tflac_u32)15U + (5U * ((15U + (blocksize * 4U)) & 0xFFFFFFF0U));
 }
 
-int flac_validate(tflac *t) {
+int flac_validate(tflac *t)
+__CPROVER_requires(__CPROVER_is_fresh(t, sizeof(tflac)))
+__CPROVER_assigns(*t)
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize < 16) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize > 65535) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate == 0) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate > 655350) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels == 0) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels > 8) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth == 0) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth != 0 && __CPROVER_old(*t).bitdepth > 32) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth != 0 && __CPROVER_old(*t).bitdepth <= 32 &&
+     __CPROVER_old(*t).max_rice_value != 0 && __CPROVER_old(*t).max_rice_value > 30) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth != 0 && __CPROVER_old(*t).bitdepth <= 32 &&
+     (__CPROVER_old(*t).max_rice_value == 0 || __CPROVER_old(*t).max_rice_value <= 30) &&
+     __CPROVER_old(*t).max_partition_order > 15) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth != 0 && __CPROVER_old(*t).bitdepth <= 32 &&
+     (__CPROVER_old(*t).max_rice_value == 0 || __CPROVER_old(*t).max_rice_value <= 30) &&
+     __CPROVER_old(*t).max_partition_order <= 15 &&
+     __CPROVER_old(*t).min_partition_order > __CPROVER_old(*t).max_partition_order) ==> (__CPROVER_return_value == -1))
+__CPROVER_ensures(
+    (__CPROVER_old(*t).blocksize >= 16 && __CPROVER_old(*t).blocksize <= 65535 &&
+     __CPROVER_old(*t).samplerate != 0 && __CPROVER_old(*t).samplerate <= 655350 &&
+     __CPROVER_old(*t).channels != 0 && __CPROVER_old(*t).channels <= 8 &&
+     __CPROVER_old(*t).bitdepth != 0 && __CPROVER_old(*t).bitdepth <= 32 &&
+     (__CPROVER_old(*t).max_rice_value == 0 || __CPROVER_old(*t).max_rice_value <= 30) &&
+     __CPROVER_old(*t).max_partition_order <= 15 &&
+     __CPROVER_old(*t).min_partition_order <= __CPROVER_old(*t).max_partition_order)
+    ==> (__CPROVER_return_value == 0 && t->cur_blocksize == __CPROVER_old(*t).blocksize))
+__CPROVER_ensures(
+    (__CPROVER_return_value == 0) ==>
+    (__CPROVER_old(*t).max_rice_value == 0
+        ? (__CPROVER_old(*t).bitdepth <= 16 ? t->max_rice_value == 14 : t->max_rice_value == 30)
+        : t->max_rice_value == __CPROVER_old(*t).max_rice_value))
+__CPROVER_ensures(
+    (__CPROVER_return_value == 0 && __CPROVER_old(*t).channel_mode != 0 &&
+     (__CPROVER_old(*t).channels != 2 || __CPROVER_old(*t).bitdepth == 32))
+    ==> (t->channel_mode == 0))
+__CPROVER_ensures(
+    (__CPROVER_return_value == 0 && __CPROVER_old(*t).channel_mode != 0 &&
+     __CPROVER_old(*t).channels == 2 && __CPROVER_old(*t).bitdepth != 32)
+    ==> (t->channel_mode == __CPROVER_old(*t).channel_mode))
+{
     if (t->blocksize < 16)
         return -1;
     if (t->blocksize > 65535)

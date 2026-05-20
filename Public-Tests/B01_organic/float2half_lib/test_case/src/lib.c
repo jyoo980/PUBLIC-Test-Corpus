@@ -105,7 +105,10 @@ static uint8_t m__shift[512] = {
     0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
     0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x0d};
 
-uint16_t float2half(float flt) {
+uint16_t float2half(float flt)
+__CPROVER_requires(__CPROVER_forall { int i; (0 <= i && i < 512) ==> m__shift[i] < 32 })
+__CPROVER_assigns()
+{
     union {
         float flt;
         uint32_t num;

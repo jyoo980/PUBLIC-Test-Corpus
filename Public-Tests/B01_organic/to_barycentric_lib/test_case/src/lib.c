@@ -1,19 +1,32 @@
 #include "lib.h"
 
-static lm_vec2 lm_v2(float x, float y) {
+static lm_vec2 lm_v2(float x, float y)
+__CPROVER_assigns()
+{
     lm_vec2 v = {x, y};
     return v;
 }
 
-static lm_vec2 lm_sub2(lm_vec2 a, lm_vec2 b) {
+static lm_vec2 lm_sub2(lm_vec2 a, lm_vec2 b)
+__CPROVER_assigns()
+{
     return lm_v2(a.x - b.x, a.y - b.y);
 }
 
-static float lm_dot2(lm_vec2 a, lm_vec2 b) {
+static float lm_dot2(lm_vec2 a, lm_vec2 b)
+__CPROVER_assigns()
+{
     return a.x * b.x + a.y * b.y;
 }
 
-lm_vec2 to_barycentric(lm_vec2 p1, lm_vec2 p2, lm_vec2 p3, lm_vec2 p) {
+lm_vec2 to_barycentric(lm_vec2 p1, lm_vec2 p2, lm_vec2 p3, lm_vec2 p)
+__CPROVER_requires(((p3.x - p1.x) * (p3.x - p1.x) + (p3.y - p1.y) * (p3.y - p1.y)) *
+                       ((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)) -
+                   ((p3.x - p1.x) * (p2.x - p1.x) + (p3.y - p1.y) * (p2.y - p1.y)) *
+                       ((p3.x - p1.x) * (p2.x - p1.x) + (p3.y - p1.y) * (p2.y - p1.y))
+                   != 0.0f)
+__CPROVER_assigns()
+{
     lm_vec2 v0 = lm_sub2(p3, p1);
     lm_vec2 v1 = lm_sub2(p2, p1);
     lm_vec2 v2 = lm_sub2(p, p1);

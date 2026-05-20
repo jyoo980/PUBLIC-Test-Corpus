@@ -3,7 +3,23 @@
 #include "lib.h"
 
 int hex2bin(uint8_t *bin, size_t bin_maxlen, const char *hex,
-                  size_t hex_len, const char *ignore, const char **hex_end_p) {
+                  size_t hex_len, const char *ignore, const char **hex_end_p)
+__CPROVER_requires(bin_maxlen > 0 && bin_maxlen < 32)
+__CPROVER_requires(hex_len > 0 && hex_len < 32)
+__CPROVER_requires(__CPROVER_is_fresh(bin, bin_maxlen))
+__CPROVER_requires(__CPROVER_is_fresh(hex, hex_len))
+__CPROVER_requires(__CPROVER_pointer_equals(ignore, NULL))
+__CPROVER_requires(__CPROVER_pointer_equals(hex_end_p, NULL) ||
+                   __CPROVER_is_fresh(hex_end_p, sizeof(*hex_end_p)))
+__CPROVER_assigns(__CPROVER_object_upto(bin, bin_maxlen);
+                  hex_end_p != NULL: *hex_end_p)
+__CPROVER_ensures(__CPROVER_return_value == -1 ||
+                  (__CPROVER_return_value >= 0 &&
+                   __CPROVER_return_value <= (int)bin_maxlen &&
+                   __CPROVER_return_value <= (int)hex_len))
+__CPROVER_ensures(hex_end_p != NULL ==>
+                  __CPROVER_pointer_in_range_dfcc(hex, *hex_end_p, hex + hex_len))
+{
     size_t bin_pos = (size_t)0U;
     size_t hex_pos = (size_t)0U;
     int ret = 0;

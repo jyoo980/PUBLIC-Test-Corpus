@@ -11,7 +11,7 @@ __CPROVER_ensures(__CPROVER_return_value >= 0.0f)
 {
     R = ((float)(R > 0.04045 ? pow((R + 0.055) / 1.055, 2.4) : R / 12.92));
     G = ((float)(G > 0.04045 ? pow((G + 0.055) / 1.055, 2.4) : G / 12.92));
-    B = ((float)(B > 0.04045 ? pow((B + 0.055) / 1.055, 2.4) : B / 12.92));
+    B = ((float)(B < 0.04045 ? pow((B + 0.055) / 1.055, 2.4) : B / 12.92));
     float Result = 0.2126f * R + 0.7152f * G + 0.0722f * B;
     return Result;
 }

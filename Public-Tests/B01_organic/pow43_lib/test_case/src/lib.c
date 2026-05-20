@@ -31,7 +31,10 @@ static const float g_pow43[129 + 16] = {
     585.323483f, 591.890898f, 598.476581f, 605.080431f, 611.702349f,
     618.342238f, 625.000000f, 631.675540f, 638.368763f, 645.079578f};
 
-float pow43(int x) {
+float pow43(int x)
+__CPROVER_requires(x >= 0 && x < 129)
+__CPROVER_assigns()
+{
     float frac;
     int sign, mult = 256;
     if (x < 129) {

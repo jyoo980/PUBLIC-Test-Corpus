@@ -1,6 +1,16 @@
 #include "lib.h"
 
-void rgb_to_hsv(float *dest, const float *src) {
+void rgb_to_hsv(float *dest, const float *src)
+__CPROVER_requires(__CPROVER_is_fresh(dest, 3 * sizeof(float)))
+__CPROVER_requires(__CPROVER_is_fresh(src, 3 * sizeof(float)))
+__CPROVER_requires(src[0] >= 0.0f && src[0] <= 1.0f)
+__CPROVER_requires(src[1] >= 0.0f && src[1] <= 1.0f)
+__CPROVER_requires(src[2] >= 0.0f && src[2] <= 1.0f)
+__CPROVER_assigns(dest[0], dest[1], dest[2])
+__CPROVER_ensures(dest[1] >= 0.0f && dest[1] <= 1.0f)
+__CPROVER_ensures(dest[2] >= 0.0f && dest[2] <= 1.0f)
+__CPROVER_ensures(dest[0] >= 0.0f && dest[0] < 360.0f)
+{
     float r = src[0];
     float g = src[1];
     float b = src[2];

@@ -2,7 +2,21 @@
 
 #include "lib.h"
 
-void hsv_to_rgb(float *dest, const float *src) {
+void hsv_to_rgb(float *dest, const float *src)
+__CPROVER_requires(__CPROVER_is_fresh(dest, 3 * sizeof(float)))
+__CPROVER_requires(__CPROVER_is_fresh(src, 3 * sizeof(float)))
+__CPROVER_requires(src[0] >= 0.0f && src[0] < 360.0f)
+__CPROVER_requires(src[1] >= 0.0f && src[1] <= 1.0f)
+__CPROVER_requires(src[2] >= 0.0f && src[2] <= 1.0f)
+__CPROVER_assigns(dest[0], dest[1], dest[2])
+__CPROVER_ensures(src[1] == 0.0f ==> (dest[0] == src[2] && dest[1] == src[2] && dest[2] == src[2]))
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 0.0f && src[0] < 60.0f) ==> dest[0] == src[2])
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 0.0f && src[0] < 60.0f) ==> dest[2] == src[2] * (1.0f - src[1]))
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 0.0f && src[0] < 60.0f) ==> dest[1] == src[2] * (1.0f - src[1] * (1.0f - (src[0] / 60.0f))))
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 60.0f && src[0] < 120.0f) ==> dest[1] == src[2])
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 60.0f && src[0] < 120.0f) ==> dest[2] == src[2] * (1.0f - src[1]))
+__CPROVER_ensures((src[1] != 0.0f && src[0] >= 60.0f && src[0] < 120.0f) ==> dest[0] == src[2] * (1.0f - src[1] * ((src[0] / 60.0f) - 1.0f)))
+{
     float r, g, b;
     float f, p, q, t;
     float h = src[0];
