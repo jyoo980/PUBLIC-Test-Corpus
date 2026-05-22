@@ -8,11 +8,18 @@ enum TFLAC_CHANNEL_MODE {
     TFLAC_CHANNEL_MODE_COUNT = 4,
 };
 
-tflac_u32 tflac_size_memory(tflac_u32 blocksize) {
+tflac_u32 tflac_size_memory(tflac_u32 blocksize)
+__CPROVER_assigns()
+{
     return (tflac_u32)15U + (5U * ((15U + (blocksize * 4U)) & 0xFFFFFFF0U));
 }
 
-int flac_validate(tflac *t) {
+int flac_validate(tflac *t)
+__CPROVER_requires(__CPROVER_is_fresh(t, sizeof(tflac)))
+__CPROVER_requires(t->max_partition_order <= 4)
+__CPROVER_assigns(t->channel_mode, t->max_rice_value, t->partition_order, t->cur_blocksize)
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == -1)
+{
     if (t->blocksize < 16)
         return -1;
     if (t->blocksize > 65535)

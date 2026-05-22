@@ -8,7 +8,11 @@ enum TFLAC_CHANNEL_MODE {
     TFLAC_CHANNEL_MODE_COUNT = 4,
 };
 
-void update_frame_header(tflac *t) {
+void update_frame_header(tflac *t)
+__CPROVER_requires(__CPROVER_is_fresh(t, sizeof(tflac)))
+__CPROVER_requires(t->channels >= 1 && t->channels <= 8)
+__CPROVER_assigns(t->frame_header)
+{
     t->frame_header = 0xFFF8U << 16;
     switch (t->cur_blocksize) {
     case 192:

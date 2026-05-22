@@ -2,7 +2,12 @@
 
 #include "lib.h"
 
-void tfm(float *dest, const float *src, int count) {
+void tfm(float *dest, const float *src, int count)
+__CPROVER_requires(count >= 0 && count <= 3)
+__CPROVER_requires(__CPROVER_is_fresh(dest, ((unsigned long)(count > 0 ? count : 1)) * 2 * sizeof(float)))
+__CPROVER_requires(__CPROVER_is_fresh(src, ((unsigned long)(count > 0 ? count : 1)) * 3 * sizeof(float)))
+__CPROVER_assigns(__CPROVER_object_whole(dest))
+{
     int i;
     for (i = 0; i < count; i++) {
         if (src[0] < src[1]) {

@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 void printIntPtrLine(const int *intNumber)
+__CPROVER_requires(__CPROVER_is_fresh(intNumber, sizeof(*intNumber)))
+__CPROVER_assigns()
 {
     printf("%d\n", *intNumber);
 }

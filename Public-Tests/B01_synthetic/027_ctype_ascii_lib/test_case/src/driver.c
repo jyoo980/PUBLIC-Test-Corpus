@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void driver(char c) {
+void driver(char c)
+__CPROVER_assigns()
+{
     setlocale(LC_ALL, "C");
     
     printf("alphanumeric: %d\n", isalnum(c));

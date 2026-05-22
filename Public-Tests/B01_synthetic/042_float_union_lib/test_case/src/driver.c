@@ -11,7 +11,9 @@ typedef union {
     double f;
 } raw_double_t;
 
-void driver(double f) {
+void driver(double f)
+__CPROVER_assigns()
+{
     raw_double_t u = {.f = f};
     printf("%llx %a %.4f\n", u.x, f, f);
 }

@@ -6,8 +6,9 @@
 #include <string.h>
 
 void printLine (const char * line)
+__CPROVER_assigns()
 {
-    if(line != NULL) 
+    if(line != NULL)
     {
         printf("%s\n", line);
     }

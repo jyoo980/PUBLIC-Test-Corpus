@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-void driver(const char *s1, const char *s2) {
+void driver(const char *s1, const char *s2)
+__CPROVER_assigns()
+{
     printf("%zu\n", strcspn(s1, s2));
 }
 

@@ -3,7 +3,15 @@
 #include "lib.h"
 
 int hex2bin(uint8_t *bin, size_t bin_maxlen, const char *hex,
-                  size_t hex_len, const char *ignore, const char **hex_end_p) {
+                  size_t hex_len, const char *ignore, const char **hex_end_p)
+__CPROVER_requires(hex_len <= 4 && bin_maxlen <= 4)
+__CPROVER_requires(__CPROVER_w_ok(bin, bin_maxlen) && __CPROVER_r_ok(bin, bin_maxlen))
+__CPROVER_requires(__CPROVER_r_ok(hex, hex_len > 0 ? hex_len : 1))
+__CPROVER_requires(ignore == 0)
+__CPROVER_requires(hex_end_p == 0 || __CPROVER_w_ok(hex_end_p, sizeof(const char *)))
+__CPROVER_assigns(__CPROVER_object_whole(bin);
+                  hex_end_p != 0: *hex_end_p)
+{
     size_t bin_pos = (size_t)0U;
     size_t hex_pos = (size_t)0U;
     int ret = 0;

@@ -1,6 +1,13 @@
 #include "lib.h"
 
-int encode_quant(int uni, int step, int pred, int tgt, int tgt2, int lsbit) {
+int encode_quant(int uni, int step, int pred, int tgt, int tgt2, int lsbit)
+__CPROVER_requires(uni > -2147483647 && uni < 2147483647)
+__CPROVER_requires(step >= 0 && step < 32768)
+__CPROVER_requires(pred > -2147483647 / 2 && pred < 2147483647 / 2)
+__CPROVER_requires(tgt > -2147483647 / 2 && tgt < 2147483647 / 2)
+__CPROVER_requires(tgt2 > -2147483647 / 2 && tgt2 < 2147483647 / 2)
+__CPROVER_assigns()
+{
     int uni1, uni2;
     int diff, p0, p1, p2, p3, d0, d1, d2, d3;
     uni1 = uni + 1;

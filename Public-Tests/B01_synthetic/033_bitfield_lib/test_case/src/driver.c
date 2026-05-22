@@ -13,11 +13,16 @@ typedef struct {
     int z;
 } foo_t;
 
-void print_foo(const foo_t *foo) {
+void print_foo(const foo_t *foo)
+__CPROVER_requires(__CPROVER_is_fresh(foo, sizeof(*foo)))
+__CPROVER_assigns()
+{
     printf("%u %u %d %d\n", foo->x, foo->y, foo->b, foo->z);
 }
 
-void driver(unsigned int x, unsigned int y, bool b, int z) {
+void driver(unsigned int x, unsigned int y, bool b, int z)
+__CPROVER_assigns()
+{
     foo_t foo = {.x = x, .y = y, .b = b, .z = z};
     print_foo(&foo);
 }

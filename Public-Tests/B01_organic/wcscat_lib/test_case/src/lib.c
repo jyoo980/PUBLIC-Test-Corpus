@@ -2,7 +2,14 @@
 
 #include "lib.h"
 
-int wcscat(wchar_t *dst, size_t numElem, const wchar_t *src) {
+int wcscat(wchar_t *dst, size_t numElem, const wchar_t *src)
+__CPROVER_requires(numElem <= 4)
+__CPROVER_requires(dst == 0 || __CPROVER_r_ok(dst, numElem * sizeof(wchar_t)))
+__CPROVER_requires(dst == 0 || __CPROVER_w_ok(dst, numElem * sizeof(wchar_t)))
+__CPROVER_requires(src == 0 || __CPROVER_r_ok(src, numElem * sizeof(wchar_t)))
+__CPROVER_assigns((dst != 0 && numElem != 0) : __CPROVER_object_whole(dst))
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == 22 || __CPROVER_return_value == 34)
+{
     wchar_t *ptr = dst;
     if (!dst || numElem == 0)
         return 22;

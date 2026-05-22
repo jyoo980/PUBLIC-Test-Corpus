@@ -3,7 +3,12 @@
 #include "lib.h"
 
 static int spritebatch_internal_sprite_less_than_or_equal(spritebatch_sprite_t *a,
-                                               spritebatch_sprite_t *b) {
+                                               spritebatch_sprite_t *b)
+__CPROVER_requires(__CPROVER_r_ok(a, sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_r_ok(b, sizeof(spritebatch_sprite_t)))
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0 || __CPROVER_return_value == 1)
+{
     if (a->sort_bits <= b->sort_bits)
         return 1;
     if (a->sort_bits == b->sort_bits && a->texture_id <= b->texture_id)
@@ -13,7 +18,12 @@ static int spritebatch_internal_sprite_less_than_or_equal(spritebatch_sprite_t *
 
 static void spritebatch_internal_merge_sort_iteration(spritebatch_sprite_t *a, int lo,
                                                int split, int hi,
-                                               spritebatch_sprite_t *b) {
+                                               spritebatch_sprite_t *b)
+__CPROVER_requires(lo >= 0 && lo <= split && split <= hi && hi <= 4)
+__CPROVER_requires(__CPROVER_r_ok(a, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_w_ok(b, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_assigns(__CPROVER_object_whole(b))
+{
     int i = lo, j = split;
     for (int k = lo; k < hi; k++) {
         if (i < split &&
@@ -29,7 +39,14 @@ static void spritebatch_internal_merge_sort_iteration(spritebatch_sprite_t *a, i
 }
 
 static void spritebatch_internal_merge_sort_recurse(spritebatch_sprite_t *b, int lo,
-                                             int hi, spritebatch_sprite_t *a) {
+                                             int hi, spritebatch_sprite_t *a)
+__CPROVER_requires(lo >= 0 && lo <= hi && hi <= 4)
+__CPROVER_requires(__CPROVER_r_ok(a, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_w_ok(a, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_r_ok(b, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_w_ok(b, (unsigned long)hi * sizeof(spritebatch_sprite_t)))
+__CPROVER_assigns(__CPROVER_object_whole(a), __CPROVER_object_whole(b))
+{
     if (hi - lo <= 1)
         return;
     int split = (lo + hi) / 2;
@@ -39,7 +56,12 @@ static void spritebatch_internal_merge_sort_recurse(spritebatch_sprite_t *b, int
 }
 
 void merge_sort(spritebatch_sprite_t *a,
-                                     spritebatch_sprite_t *b, int size) {
+                                     spritebatch_sprite_t *b, int size)
+__CPROVER_requires(size >= 0 && size <= 4)
+__CPROVER_requires(__CPROVER_is_fresh(a, (unsigned long)(size > 0 ? size : 1) * sizeof(spritebatch_sprite_t)))
+__CPROVER_requires(__CPROVER_is_fresh(b, (unsigned long)(size > 0 ? size : 1) * sizeof(spritebatch_sprite_t)))
+__CPROVER_assigns(__CPROVER_object_whole(a), __CPROVER_object_whole(b))
+{
     memcpy(b, a, sizeof(spritebatch_sprite_t) * size);
     spritebatch_internal_merge_sort_recurse(b, 0, size, a);
 }

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 void printLine(const char *line)
+__CPROVER_assigns()
 {
     if (line != NULL)
     {

@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void foo(int x, int y) {
+static void foo(int x, int y)
+__CPROVER_requires(x >= 0 && y >= 0)
+__CPROVER_assigns()
+{
     while (x > 0 || y > 0) {
         printf("loop\n");
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 void printHexCharLine (char charHex)
+__CPROVER_assigns()
 {
     printf("%02x\n", charHex);
 }

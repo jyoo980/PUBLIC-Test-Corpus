@@ -1,6 +1,10 @@
 #include "lib.h"
 
-int div_euclid(int v1, int v2) {
+int div_euclid(int v1, int v2)
+__CPROVER_requires(v1 > -100000 && v1 < 100000)
+__CPROVER_requires(v2 > -100000 && v2 < 100000)
+__CPROVER_assigns()
+{
     if (v2 == 0) {
         return 0;
     }

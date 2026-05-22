@@ -4,14 +4,16 @@
 #include <stdio.h>
 
 void printLine (const char * line)
+__CPROVER_assigns()
 {
-    if(line != NULL) 
+    if(line != NULL)
     {
         printf("%s\n", line);
     }
 }
 
 void printIntLine (int intNumber)
+__CPROVER_assigns()
 {
     printf("%d\n", intNumber);
 }

@@ -1,7 +1,13 @@
 #include "lib.h"
 
 int bitwriter_add(tflac_bitwriter *bw, tflac_u32 bits,
-                                      tflac_uint val) {
+                                      tflac_uint val)
+__CPROVER_requires(__CPROVER_is_fresh(bw, sizeof(tflac_bitwriter)))
+__CPROVER_requires(bits > 0 && bits < 64)
+__CPROVER_requires(bw->bits < 64)
+__CPROVER_assigns(bw->val, bw->bits, bw->tot)
+__CPROVER_ensures(__CPROVER_return_value == 0)
+{
     const tflac_uint mask = (18446744073709551615UL) << 1;
     tflac_u32 b;
     int r;

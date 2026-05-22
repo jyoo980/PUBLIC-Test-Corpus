@@ -6,14 +6,16 @@
 #include <stdlib.h>
 
 void printLine (const char * line)
+__CPROVER_assigns()
 {
-    if(line != NULL) 
+    if(line != NULL)
     {
         printf("%s\n", line);
     }
 }
 
 void printHexCharLine (char charHex)
+__CPROVER_assigns()
 {
     printf("%02x\n", charHex);
 }

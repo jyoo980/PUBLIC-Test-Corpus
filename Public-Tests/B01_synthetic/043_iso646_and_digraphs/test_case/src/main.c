@@ -4,7 +4,9 @@
 %:include <stdio.h>
 %:include <iso646.h>
 
-void driver(int x, int y) <%
+void driver(int x, int y)
+__CPROVER_assigns()
+<%
     int result = x bitor compl y;
     printf("%d", result);
     puts("");

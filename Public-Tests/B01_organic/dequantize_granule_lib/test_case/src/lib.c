@@ -1,6 +1,12 @@
 #include "lib.h"
 
-static uint32_t get_bits(bs_t *bs, int n) {
+static uint32_t get_bits(bs_t *bs, int n)
+__CPROVER_requires(__CPROVER_is_fresh(bs, sizeof(bs_t)))
+__CPROVER_requires(n >= 0 && n <= 20)
+__CPROVER_requires(bs->pos >= 0 && bs->limit >= bs->pos && bs->limit <= 64)
+__CPROVER_requires(__CPROVER_is_fresh(bs->buf, 16))
+__CPROVER_assigns(bs->pos)
+{
     uint32_t next, cache = 0, s = bs->pos & 7;
     int shl = n + s;
     const uint8_t *p = bs->buf + (bs->pos >> 3);
@@ -15,7 +21,17 @@ static uint32_t get_bits(bs_t *bs, int n) {
 }
 
 int dequantize_granule(float *grbuf, bs_t *bs, L12_scale_info *sci,
-                                  int group_size) {
+                                  int group_size)
+__CPROVER_requires(group_size >= 0 && group_size <= 3)
+__CPROVER_requires(__CPROVER_is_fresh(grbuf, 4096 * sizeof(float)))
+__CPROVER_requires(__CPROVER_is_fresh(bs, sizeof(bs_t)))
+__CPROVER_requires(__CPROVER_is_fresh(bs->buf, 16))
+__CPROVER_requires(bs->pos >= 0 && bs->limit >= bs->pos && bs->limit <= 64)
+__CPROVER_requires(__CPROVER_is_fresh(sci, sizeof(L12_scale_info)))
+__CPROVER_requires(sci->total_bands <= 2)
+__CPROVER_assigns(__CPROVER_object_whole(grbuf), bs->pos)
+__CPROVER_ensures(__CPROVER_return_value == group_size * 4)
+{
     int i, j, k, choff = 576;
     for (j = 0; j < 4; j++) {
         float *dst = grbuf + group_size * j;

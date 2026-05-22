@@ -2,7 +2,18 @@
 
 typedef tflac_u64 tflac_uint;
 
-void tflac_pack_u64le(tflac_u8 *d, tflac_u64 n) {
+void tflac_pack_u64le(tflac_u8 *d, tflac_u64 n)
+__CPROVER_requires(__CPROVER_is_fresh(d, 8 * sizeof(tflac_u8)))
+__CPROVER_assigns(__CPROVER_object_upto(d, 8 * sizeof(tflac_u8)))
+__CPROVER_ensures(d[0] == (tflac_u8)(n))
+__CPROVER_ensures(d[1] == (tflac_u8)(n >> 8))
+__CPROVER_ensures(d[2] == (tflac_u8)(n >> 16))
+__CPROVER_ensures(d[3] == (tflac_u8)(n >> 24))
+__CPROVER_ensures(d[4] == (tflac_u8)(n >> 32))
+__CPROVER_ensures(d[5] == (tflac_u8)(n >> 40))
+__CPROVER_ensures(d[6] == (tflac_u8)(n >> 48))
+__CPROVER_ensures(d[7] == (tflac_u8)(n >> 56))
+{
     d[0] = (tflac_u8)(n);
     d[1] = (tflac_u8)(n >> 8);
     d[2] = (tflac_u8)(n >> 16);
@@ -14,7 +25,12 @@ void tflac_pack_u64le(tflac_u8 *d, tflac_u64 n) {
 }
 
 void tflac_md5_addsample(tflac_md5 *m, tflac_u32 bits,
-                                       tflac_uint val) {
+                                       tflac_uint val)
+__CPROVER_requires(__CPROVER_is_fresh(m, sizeof(tflac_md5)))
+__CPROVER_requires(bits == 64)
+__CPROVER_requires(m->pos < 64)
+__CPROVER_assigns(m->total, m->pos, __CPROVER_object_whole(m->buffer))
+{
     tflac_u32 bytes;
     ((m->total) += (tflac_u64)(bits));
     bytes = bits / 8;
@@ -30,7 +46,13 @@ void tflac_md5_addsample(tflac_md5 *m, tflac_u32 bits,
     }
 }
 
-tflac_u32 update_md5(tflac *t, const tflac_s32 *samples) {
+tflac_u32 update_md5(tflac *t, const tflac_s32 *samples)
+__CPROVER_requires(__CPROVER_is_fresh(t, sizeof(tflac)))
+__CPROVER_requires(__CPROVER_is_fresh(samples, 5 * 8 * 8 * sizeof(tflac_s32)))
+__CPROVER_requires(t->md5_ctx.pos < 64)
+__CPROVER_assigns(t->md5_ctx.total, t->md5_ctx.pos, __CPROVER_object_whole(t->md5_ctx.buffer))
+__CPROVER_ensures(__CPROVER_return_value == (tflac_u32)(__CPROVER_old(t->cur_blocksize) * __CPROVER_old(t->channels) - 5 * sizeof(tflac_u64)))
+{
     tflac_u32 b = t->cur_blocksize * t->channels;
     const tflac_u32 step = sizeof(tflac_uint);
     tflac_uint v;

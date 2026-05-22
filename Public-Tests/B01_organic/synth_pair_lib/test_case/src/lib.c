@@ -1,6 +1,8 @@
 #include "lib.h"
 
-static int16_t mp3d_scale_pcm(float sample) {
+static int16_t mp3d_scale_pcm(float sample)
+__CPROVER_assigns()
+{
     if (sample >= 32766.5)
         return (int16_t)32767;
     if (sample <= -32767.5)
@@ -10,7 +12,12 @@ static int16_t mp3d_scale_pcm(float sample) {
     return s;
 }
 
-void synth_pair(mp3d_sample_t *pcm, int nch, const float *z) {
+void synth_pair(mp3d_sample_t *pcm, int nch, const float *z)
+__CPROVER_requires(nch >= 1 && nch <= 4)
+__CPROVER_requires(__CPROVER_is_fresh(pcm, (16 * (unsigned long)nch + 1) * sizeof(mp3d_sample_t)))
+__CPROVER_requires(__CPROVER_is_fresh(z, (14 * 64 + 3) * sizeof(float)))
+__CPROVER_assigns(pcm[0], pcm[16 * nch])
+{
     float a;
     a = (z[14 * 64] - z[0]) * 29;
     a += (z[1 * 64] + z[13 * 64]) * 213;

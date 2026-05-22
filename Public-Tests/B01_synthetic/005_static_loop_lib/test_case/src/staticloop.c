@@ -5,7 +5,8 @@
 #include "staticloop.h"
 
 int
-static_sum(int update) {
+static_sum(int update)
+{
   static int sum = 0;
   sum += update;
   return sum;

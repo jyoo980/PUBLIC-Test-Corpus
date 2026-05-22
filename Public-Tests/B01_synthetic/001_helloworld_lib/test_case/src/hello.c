@@ -5,7 +5,10 @@
 
 #include "hello.h"
 
-int helloworld() {
+int helloworld()
+__CPROVER_assigns()
+__CPROVER_ensures(__CPROVER_return_value == 0)
+{
     printf("Hello World!\n");
     return 0;
 }

@@ -4,7 +4,14 @@
 #include "lib.h"
 
 char *bin2hex(char *hex, size_t hex_maxlen, const uint8_t *bin,
-                    size_t bin_len) {
+                    size_t bin_len)
+__CPROVER_requires(bin_len <= 4)
+__CPROVER_requires(hex_maxlen > bin_len * 2U && hex_maxlen <= 16)
+__CPROVER_requires(__CPROVER_is_fresh(bin, bin_len > 0 ? bin_len : 1))
+__CPROVER_requires(__CPROVER_is_fresh(hex, hex_maxlen))
+__CPROVER_assigns(__CPROVER_object_whole(hex))
+__CPROVER_ensures(__CPROVER_return_value == hex)
+{
     size_t i = (size_t)0U;
     unsigned int x;
     int b;
